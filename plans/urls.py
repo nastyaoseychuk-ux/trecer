@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.urls import path
+from .views import TaskListView, TaskDetailView, AddComentView
 
 
 def task_list(request):
@@ -25,9 +26,11 @@ def task_delete(request, pk):
 app_name = "plans"
 
 urlpatterns = [
-    path("", task_list, name="task_list"),
+    path("", TaskListView.as_view(), name="task_list"),
     path("task/create/", task_create, name="task_create"),
-    path("task/<int:pk>/", task_detail, name="task_detail"),
+    path("task/<int:pk>/", TaskDetailView.as_view(), name="task_detail"),
     path("task/<int:pk>/edit/", task_update, name="task_update"),
     path("task/<int:pk>/delete/", task_delete, name="task_delete"),
+    path("task/<int:pk>/comment/", AddComentView.as_view(), name="comment_create"),
 ]
+

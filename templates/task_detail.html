@@ -1,0 +1,519 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} — TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="detail-page">
+
+    <a href="{% url 'plans:task_list' %}" class="back-link">
+        ← Назад до головної
+    </a>
+
+    <div class="detail-layout">
+
+        <!-- Основна інформація -->
+        <section class="detail-main">
+
+            <div class="detail-top">
+                <span class="page-label">ДЕТАЛІ ЗАВДАННЯ</span>
+
+                <div class="detail-actions">
+                    <a href="{% url 'plans:task_update' task.pk %}" class="edit-btn">
+                        ✎ Редагувати
+                    </a>
+
+                    <a href="{% url 'plans:task_delete' task.pk %}" class="delete-btn">
+                        Видалити
+                    </a>
+                </div>
+            </div>
+
+            <h1>{{ task.title }}</h1>
+
+            <div class="task-meta">
+                <span class="priority priority-{{ task.priority }}">
+                    {% if task.priority == 'high' %}
+                        Високий пріоритет
+                    {% elif task.priority == 'medium' %}
+                        Середній пріоритет
+                    {% else %}
+                        Низький пріоритет
+                    {% endif %}
+                </span>
+
+                <span class="date-info">
+                    Створено {{ task.created_at|date:"d.m.Y" }}
+                </span>
+            </div>
+
+            <div class="content-card">
+                <h3>Опис завдання</h3>
+
+                {% if task.description %}
+                    <p class="description">{{ task.description|linebreaksbr }}</p>
+                {% else %}
+                    <p class="muted">Опис поки не додано.</p>
+                {% endif %}
+            </div>
+
+            <!-- Коментарі -->
+            <div class="content-card comments-section">
+                <div class="comments-heading">
+                    <h3>Обговорення</h3>
+                    <span>{{ task.comments.count }}</span>
+                </div>
+
+                {% for comment in task.comments.all %}
+                    <div class="comment">
+                        <div class="comment-avatar">
+                            {{ comment.author.username|first|upper }}
+                        </div>
+
+                        <div class="comment-content">
+                            <div class="comment-info">
+                                <strong>{{ comment.author.username }}</strong>
+                                <span>{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                            </div>
+
+                            <p>{{ comment.content|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-comments">
+                        <span>✦</span>
+                        <p>Коментарів поки немає.</p>
+                        <small>Будь першим, хто залишить повідомлення.</small>
+                    </div>
+                {% endfor %}
+
+                <form method="post"
+                    action="{% url 'plans:comment_create' task.pk %}"
+                    class="comment-form">
+                    {% csrf_token %}
+                    <textarea name="content"
+                            placeholder="Напиши коментар..."
+                            required></textarea>
+                    <button type="submit">Надіслати коментар</button>
+                </form>
+            </div>
+
+        </section>
+
+        <!-- Бокова інформація -->
+        <aside class="detail-sidebar">
+
+            <div class="sidebar-card">
+                <h3>Інформація</h3>
+
+                <div class="info-row">
+                    <span>Автор</span>
+                    <strong>{{ task.author.username }}</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Пріоритет</span>
+                    <strong>
+                        {% if task.priority == 'high' %}
+                            Високий
+                        {% elif task.priority == 'medium' %}
+                            Середній
+                        {% else %}
+                            Низький
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Статус</span>
+                    <strong>
+                        {% if task.status == 'pending' %}
+                            До виконання
+                        {% elif task.status == 'in_progress' %}
+                            У процесі
+                        {% else %}
+                            Виконано
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Створено</span>
+                    <strong>{{ task.created_at|date:"d.m.Y" }}</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Оновлено</span>
+                    <strong>{{ task.updated_at|date:"d.m.Y" }}</strong>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Виконавці</h3>
+
+                {% for executor in task.executors.all %}
+                    <div class="executor">
+                        <div class="executor-avatar">
+                            {{ executor.username|first|upper }}
+                        </div>
+                        <span>{{ executor.username }}</span>
+                    </div>
+                {% empty %}
+                    <p class="muted">Виконавців ще не призначено.</p>
+                {% endfor %}
+            </div>
+
+        </aside>
+
+    </div>
+</div>
+
+<style>
+.detail-page {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 38px 5%;
+    color: #382832;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 25px;
+    color: #85516a;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: #581d32;
+}
+
+.detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+.detail-main {
+    min-width: 0;
+}
+
+.detail-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.page-label {
+    color: #a16b80;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 9px;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 10px 15px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.edit-btn {
+    background: #f1e4e9;
+    color: #702b45;
+}
+
+.edit-btn:hover {
+    background: #e8d2dc;
+}
+
+.delete-btn {
+    background: #fae9e8;
+    color: #b34d4d;
+}
+
+.delete-btn:hover {
+    background: #f4d6d5;
+}
+
+.detail-main h1 {
+    margin: 22px 0 15px;
+    font-size: clamp(27px, 4vw, 37px);
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-bottom: 25px;
+}
+
+.priority {
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.priority-high {
+    background: #fae5e5;
+    color: #bd5151;
+}
+
+.priority-medium {
+    background: #fff0dc;
+    color: #bd833b;
+}
+
+.priority-low {
+    background: #e5f1e9;
+    color: #548a66;
+}
+
+.date-info {
+    color: #988a90;
+    font-size: 12px;
+}
+
+.content-card,
+.sidebar-card {
+    padding: 24px;
+    margin-bottom: 19px;
+    background: #fff;
+    border: 1px solid #eee5e4;
+    border-radius: 16px;
+}
+
+.content-card h3,
+.sidebar-card h3 {
+    margin: 0 0 20px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.description {
+    margin: 0;
+    color: #75676e;
+    font-size: 14px;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+}
+
+.muted {
+    color: #a2949a;
+    font-size: 13px;
+}
+
+/* КОМЕНТАРІ */
+.comments-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comments-heading span {
+    display: grid;
+    place-items: center;
+    min-width: 25px;
+    height: 25px;
+    padding: 0 7px;
+    background: #f3e8ec;
+    color: #752c48;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.comment {
+    display: flex;
+    gap: 13px;
+    padding: 17px 0;
+    border-bottom: 1px solid #f1ebea;
+}
+
+.comment-avatar,
+.executor-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #f1e2e8;
+    color: #762e49;
+    font-weight: 700;
+}
+
+.comment-content {
+    min-width: 0;
+}
+
+.comment-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment-info strong {
+    font-size: 12px;
+}
+
+.comment-info span {
+    color: #a2949a;
+    font-size: 10px;
+}
+
+.comment-content p {
+    margin: 8px 0 0;
+    color: #766a70;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.empty-comments {
+    padding: 25px 10px;
+    text-align: center;
+}
+
+.empty-comments span {
+    color: #b17b91;
+    font-size: 27px;
+}
+
+.empty-comments p {
+    margin: 8px 0 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.empty-comments small {
+    color: #a2949a;
+    font-size: 11px;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 14px;
+    border: 1px solid #eee3e5;
+    border-radius: 11px;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.comment-form textarea:focus {
+    border-color: #9c6077;
+}
+
+.comment-form button {
+    padding: 12px 17px;
+    border: none;
+    border-radius: 9px;
+    background: #651f35;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.comment-form button:hover {
+    background: #842d49;
+    transform: translateY(-2px);
+}
+
+/* БОКОВА ПАНЕЛЬ */
+.sidebar-card h3 {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0e9e8;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 17px 0;
+}
+
+.info-row span {
+    color: #988b91;
+    font-size: 12px;
+}
+
+.info-row strong {
+    font-size: 12px;
+    text-align: right;
+}
+
+.executor {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin: 13px 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.executor-avatar {
+    width: 33px;
+    height: 33px;
+    font-size: 12px;
+}
+
+@media (max-width: 850px) {
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 550px) {
+    .detail-page {
+        padding: 25px 15px;
+    }
+
+    .detail-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .content-card,
+    .sidebar-card {
+        padding: 18px;
+    }
+}
+</style>
+
+{% endblock %}

@@ -2,14 +2,15 @@ from django.db import models
 
 class To_do(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
+        ('pending', 'До виконання'),
+        ('in_progress', 'У процесі'),
+        ('completed', 'Виконано'),
     ]
+
     PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
+        ('low', 'Низький'),
+        ('medium', 'Середній'),
+        ('high', 'Високий'),
     ]
     title = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)

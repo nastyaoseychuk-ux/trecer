@@ -1,0 +1,350 @@
+
+<header class="main-header">
+    <div class="header-container">
+
+        <!-- Логотип -->
+        <a href="{% url 'plans:task_list' %}" class="brand">
+            <span class="brand-icon">T</span>
+            <span class="brand-name">Task<span>Flow</span></span>
+        </a>
+
+        <!-- Навігація -->
+        <nav class="header-nav" id="headerNav">
+            <a href="{% url 'plans:task_list' %}" class="nav-link active">
+                <span>⌂</span>
+                Головна
+            </a>
+
+            <a href="{% url 'plans:task_list' %}" class="nav-link">
+                <span>▤</span>
+                Мої завдання
+            </a>
+        </nav>
+
+        <!-- Права частина -->
+        <div class="header-actions">
+
+            <a href="{% url 'plans:task_create' %}" class="header-create">
+                <span>＋</span>
+                Створити завдання
+            </a>
+
+            {% if user.is_authenticated %}
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        {{ user.username|first|upper }}
+                    </div>
+
+                    <div class="user-info">
+                        <strong>{{ user.username }}</strong>
+                        <span>Мій профіль</span>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-link">
+                    Увійти
+                </a>
+            {% endif %}
+
+        </div>
+
+        <!-- Мобільне меню -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn"
+                type="button" aria-label="Відкрити меню"
+                aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+    </div>
+</header>
+
+<style>
+/* HEADER */
+.main-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background: rgba(255, 252, 250, .96);
+    border-bottom: 1px solid #eee5e4;
+    backdrop-filter: blur(15px);
+}
+
+.header-container {
+    max-width: 1500px;
+    min-height: 78px;
+    margin: 0 auto;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 35px;
+}
+
+/* ЛОГОТИП */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 39px;
+    height: 39px;
+    border-radius: 12px;
+    background: #651f35;
+    color: #fffaf7;
+    font-size: 21px;
+    font-weight: 800;
+    box-shadow: 0 5px 12px rgba(101, 31, 53, .18);
+}
+
+.brand-name {
+    color: #382832;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.8px;
+}
+
+.brand-name span {
+    color: #8b3655;
+}
+
+/* НАВІГАЦІЯ */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-right: auto;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 15px;
+    border-radius: 10px;
+    color: #80727a;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.nav-link span {
+    font-size: 18px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #f3e7eb;
+    color: #702b45;
+}
+
+/* ПРАВА ЧАСТИНА */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.header-create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 17px;
+    border-radius: 10px;
+    background: #651f35;
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    transition: .25s;
+}
+
+.header-create span {
+    font-size: 19px;
+}
+
+.header-create:hover {
+    background: #842d49;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(101, 31, 53, .17);
+}
+
+/* ПРОФІЛЬ */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    display: grid;
+    place-items: center;
+    width: 39px;
+    height: 39px;
+    border-radius: 12px;
+    background: #f0dfe5;
+    color: #702b45;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.user-info strong {
+    color: #382832;
+    font-size: 12px;
+}
+
+.user-info span {
+    color: #a09298;
+    font-size: 10px;
+}
+
+.login-link {
+    color: #702b45;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* МОБІЛЬНА КНОПКА */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    border: 1px solid #eee2e5;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.mobile-menu-btn span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 5px;
+    background: #651f35;
+    transition: .25s;
+}
+
+/* АДАПТИВНІСТЬ */
+@media (max-width: 950px) {
+    .header-container {
+        gap: 15px;
+    }
+
+    .header-actions {
+        gap: 13px;
+    }
+
+    .user-info {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .header-container {
+        min-height: 68px;
+        padding: 0 18px;
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+        order: 3;
+    }
+
+    .header-actions {
+        margin-left: auto;
+    }
+
+    .header-create {
+        padding: 10px 12px;
+        font-size: 0;
+    }
+
+    .header-create span {
+        font-size: 21px;
+    }
+
+    .user-profile {
+        display: none;
+    }
+
+    .header-nav {
+        display: none;
+        position: absolute;
+        top: 68px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+        margin: 0;
+        padding: 15px 18px 20px;
+        background: #fffdfa;
+        border-bottom: 1px solid #eee5e4;
+        box-shadow: 0 12px 20px rgba(60, 30, 40, .07);
+    }
+
+    .header-nav.show {
+        display: flex;
+    }
+
+    .nav-link {
+        padding: 13px;
+    }
+
+    .mobile-menu-btn.open span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .mobile-menu-btn.open span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-btn.open span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const nav = document.getElementById('headerNav');
+
+    if (!menuBtn || !nav) return;
+
+    menuBtn.addEventListener('click', function () {
+        const isOpen = nav.classList.toggle('show');
+
+        menuBtn.classList.toggle('open', isOpen);
+        menuBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            nav.classList.remove('show');
+            menuBtn.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
+});
+</script>
